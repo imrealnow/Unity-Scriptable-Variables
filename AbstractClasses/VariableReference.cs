@@ -2,15 +2,15 @@
 using UnityEngine;
 
 [Serializable]
-public abstract class VariableReference <T, S> 
-    where S: SharedVariable<T>
+public abstract class VariableReference<T, S>
+    where S : SharedVariable<T>
 {
     [SerializeField] private T _value;
     [SerializeField] public S _variable;
     [SerializeField] public bool useConstant = true;
     public T Value
     {
-        get 
+        get
         {
             if (useConstant)
                 return _value;

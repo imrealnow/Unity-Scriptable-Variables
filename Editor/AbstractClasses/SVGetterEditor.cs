@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -87,7 +86,7 @@ public abstract class SVGetterEditor<T, S> : Editor
             {
                 if (member.MemberType == MemberTypes.Field ||
                     member.MemberType == MemberTypes.Property)
-                { 
+                {
                     object[] atributes = member.GetCustomAttributes(typeof(ObsoleteAttribute), true);
                     if (atributes.Length == 0)
                     {

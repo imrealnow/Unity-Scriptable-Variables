@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using System.Reflection;
+using UnityEngine;
 
 public abstract class SharedVariableGetter<T, S> : MonoBehaviour
     where S : SharedVariable<T>

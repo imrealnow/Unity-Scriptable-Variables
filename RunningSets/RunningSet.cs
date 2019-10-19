@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "RunningSet", menuName = "SO/RunningSet", order = 1)]
-public class RunningSet: ScriptableObject
+public class RunningSet : ScriptableObject
 {
     public List<GameObject> set = new List<GameObject>();
 
@@ -16,7 +15,7 @@ public class RunningSet: ScriptableObject
 
     public void AddToSet(GameObject objToAdd)
     {
-        if(!set.Contains(objToAdd))
+        if (!set.Contains(objToAdd))
             set.Add(objToAdd);
     }
 

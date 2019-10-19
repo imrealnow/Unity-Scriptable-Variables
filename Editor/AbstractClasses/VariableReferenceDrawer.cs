@@ -1,9 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using System.Linq;
-using System;
-using System.Reflection;
+﻿using UnityEditor;
+using UnityEngine;
 
 public abstract class VariableReferenceDrawer<T, S> : PropertyDrawer
     where S : SharedVariable<T>

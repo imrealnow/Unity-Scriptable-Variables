@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 public abstract class SharedVariableSetter<T, S> : MonoBehaviour
     where S : SharedVariable<T>
 {

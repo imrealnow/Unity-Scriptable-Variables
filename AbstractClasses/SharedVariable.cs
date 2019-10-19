@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SharedVariable<T> : ScriptableObject
 {
@@ -18,15 +16,16 @@ public class SharedVariable<T> : ScriptableObject
     public delegate void OnVariableChanged();
     public OnVariableChanged variableChanged;
 
-    public T Value {
-        get 
+    public T Value
+    {
+        get
         {
             if (resetValueOnLoad)
                 return _placeholderValue;
             else
                 return _variable;
         }
-        set 
+        set
         {
             if (resetValueOnLoad)
                 _placeholderValue = value;
@@ -40,7 +39,7 @@ public class SharedVariable<T> : ScriptableObject
 
     private void OnEnable()
     {
-        if(resetValueOnLoad)
+        if (resetValueOnLoad)
             _placeholderValue = _variable;
     }
 }
