@@ -4,18 +4,18 @@ using UnityEngine;
 public abstract class VariableReferenceDrawer<T, S> : PropertyDrawer
     where S : SharedVariable<T>
 {
-    private const float lineHeight = 20;
-    private const float lineSpacing = 6;
-    private const float buttonWidth = 100;
-    private const float foldoutWidth = 14;
-    private const float margin = 19f;
-    private const float boxPadding = 2;
+    private readonly float lineHeight = 20;
+    private readonly float lineSpacing = 6;
+    private readonly float buttonWidth = 100;
+    private readonly float foldoutWidth = 14;
+    private readonly float margin = 19f;
+    private readonly float boxPadding = 2;
 
     private bool foldout = true;
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        return foldout ? (lineHeight + lineSpacing) * 2 : lineHeight + lineSpacing;
+        return foldout ? (lineHeight + lineSpacing) * 2 : lineHeight + lineSpacing * 2;
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

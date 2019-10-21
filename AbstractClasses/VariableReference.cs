@@ -2,12 +2,13 @@
 using UnityEngine;
 
 [Serializable]
-public abstract class VariableReference<T, S>
+public abstract class VariableReference<T, S> : IEquatable<VariableReference<T,S>>
     where S : SharedVariable<T>
 {
     [SerializeField] private T _value;
     [SerializeField] public S _variable;
     [SerializeField] public bool useConstant = true;
+
     public T Value
     {
         get
@@ -31,5 +32,10 @@ public abstract class VariableReference<T, S>
                 _value = value;
             }
         }
+    }
+
+    public bool Equals(VariableReference<T, S> other)
+    {
+        return Value.Equals(other.Value);
     }
 }
