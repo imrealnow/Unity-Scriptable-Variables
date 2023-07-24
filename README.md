@@ -10,13 +10,13 @@ This project is a set of Unity scripts and tools designed to facilitate the use 
 
 - **Variable References:** These allow you to use either a constant value or a reference to a shared variable, providing greater flexibility in how you use variables in your game.
 
-- **Event Systems:** Leverage the power of Unity Events, but with a more flexible and decoupled design, thanks to the use of ScriptableObjects.
+- **Event Systems:** Leverage the power of Unity Events, but with a more flexible and decoupled design.
 
-- **SCooldowns:** Implement a duration-based cooldown system with SCooldowns. They store a duration and provide the percentage of time remaining before they reset, making it easy to control game mechanics such as abilities, AI behaviors, and more.
+- **Cooldowns:** Implement a duration-based cooldown system with SCooldowns. They store a duration and provide the percentage of time remaining before they reset, making it easy to control game mechanics such as abilities and more.
 
-- **SManagers:** Make use of SManagers, special objects that maintain references to sets of other ScriptableObjects. Ideal for managing large groups of shared variables or SCooldowns.
+- **Manager Scripts:** Make use of SManagers, which essentially work as Singleton Objects but can be referenced from anywhere. Ideal for managing high-level game systems.
 
-- **Custom Editor Tools:** Generate necessary boilerplate scripts to support new shared variable types, extend the SCooldown or SManager classes, and tailor the Unity Editor to your needs with a custom editor window.
+- **Custom Editor Tools:** Generate necessary boilerplate scripts to support new shared variable types.
 
 ## Usage
 
