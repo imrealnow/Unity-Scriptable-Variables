@@ -11,7 +11,7 @@ public class Cooldown
     [SerializeField] private float _duration;
     [SerializeField] private float _startTime;
     [SerializeField] private bool _initialised;
-    
+
 
     private float EndTime
     {
@@ -43,13 +43,18 @@ public class Cooldown
         return GetProgressToReset() >= 1 ? 0 : EndTime - Time.time;
     }
 
+    public void ReduceCooldown(float percent)
+    {
+        _startTime += Duration * Mathf.Clamp(percent, 0, 1);
+    }
+
     /// <summary>
     /// Try to use and restart the cooldown if it's available.
     /// </summary>
     /// <returns>Returns true if the cooldown was available and restarted</returns>
     public bool TryUseCooldown()
     {
-        if (Time.time < EndTime)
+        if (Time.time <= EndTime)
             return false;
 
         _startTime = Time.time;
@@ -73,5 +78,12 @@ public class Cooldown
     public Cooldown()
     {
         _initialised = true;
+    }
+
+    public Cooldown(float duration)
+    {
+        _initialised = true;
+        _duration = Mathf.Abs(duration);
+        _startTime = Time.time - duration;
     }
 }

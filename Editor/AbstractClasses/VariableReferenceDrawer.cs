@@ -8,7 +8,6 @@ public abstract class VariableReferenceDrawer<T, S> : PropertyDrawer
     private readonly float lineSpacing = 6;
     private readonly float buttonWidth = 100;
     private readonly float foldoutWidth = 14;
-    private readonly float margin = 19f;
     private readonly float boxPadding = 2;
 
     private bool foldout = true;

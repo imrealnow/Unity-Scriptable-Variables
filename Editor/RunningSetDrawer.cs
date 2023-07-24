@@ -19,7 +19,9 @@ public class SetHandlerEditor : Editor
         EditorGUILayout.BeginVertical();
         GUIContent setLabel = new GUIContent("Running Set");
         EditorGUILayout.PropertyField(serializedObject.FindProperty("runningSet"), setLabel);
-        EditorGUILayout.HelpBox("Current object count: " + _target.runningSet.Count.ToString(), MessageType.Info);
+        if(_target.runningSet != null)
+            EditorGUILayout.HelpBox("Current object count: " + _target.runningSet.Count.ToString(), MessageType.Info);
+        serializedObject.ApplyModifiedProperties();
         EditorGUILayout.EndVertical();
     }
 }

@@ -9,29 +9,28 @@ public abstract class SharedVariableGetter<T, S> : MonoBehaviour
     public bool setOnUpdate;
     public bool setOnStart;
 
-    [Space]
+    [SerializeField, HideInInspector] private Component targetScript = null;
+    public Component TargetScript => targetScript;
 
-    [HideInInspector] public Component targetScript;
-    string _fieldName;
-    [HideInInspector] public string fieldName = "";
+    [SerializeField, HideInInspector] private string fieldName = "";
+    public string FieldName => fieldName;
 
     string[] splitFieldName;
     MemberInfo[] memberInfo;
 
     char[] split = { '.' };
 
-    private void GetFieldInfo()
+    public void UpdateFieldInfo()
     {
-        _fieldName = fieldName;
-        if (targetScript == null)
+        if (TargetScript == null)
         {
             memberInfo = new MemberInfo[0];
             return;
         }
-        splitFieldName = fieldName.Split(split);
+        splitFieldName = FieldName.Split(split);
         if (splitFieldName.Length < 1) return;
         memberInfo = new MemberInfo[splitFieldName.Length];
-        var type = targetScript.GetType();
+        var type = TargetScript.GetType();
         for (int i = 0; i < memberInfo.Length; i++)
         {
             MemberInfo[] tempArray = type.GetMember(splitFieldName[i], BindingFlags.Public | BindingFlags.Instance);
@@ -59,8 +58,8 @@ public abstract class SharedVariableGetter<T, S> : MonoBehaviour
         get
         {
             _Value = default(T);
-            if (fieldName != _fieldName) GetFieldInfo();
-            object currentTarget = targetScript;
+            UpdateFieldInfo();
+            object currentTarget = TargetScript;
             for (int i = 0; i < memberInfo.Length; i++)
             {
                 if (memberInfo[i] == null) return default(T);
@@ -82,9 +81,9 @@ public abstract class SharedVariableGetter<T, S> : MonoBehaviour
             {
                 _Value = (T)Convert.ChangeType(currentTarget, typeof(T));
             }
-            catch
+            catch (Exception ex)
             {
-
+                Debug.LogException(ex);
             }
 
             return _Value;

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[System.Serializable]
 public class SharedVariable<T> : ScriptableObject
 {
     [SerializeField]
@@ -29,11 +30,13 @@ public class SharedVariable<T> : ScriptableObject
         {
             if (resetValueOnLoad)
                 _placeholderValue = value;
-            else
+            else if (!_variable.Equals(value))
+            {
                 _variable = value;
+                if (variableChanged != null)
+                    variableChanged.Invoke();
+            }
 
-            if (variableChanged != null)
-                variableChanged.Invoke();
         }
     }
 
