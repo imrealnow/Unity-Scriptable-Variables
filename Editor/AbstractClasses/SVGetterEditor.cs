@@ -5,6 +5,9 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Custom editor for SharedVariableGetter objects
+/// </summary>
 public abstract class SVGetterEditor<T, S> : Editor
     where S : SharedVariable<T>
 {
@@ -13,13 +16,7 @@ public abstract class SVGetterEditor<T, S> : Editor
 
     private void OnEnable()
     {
-        if (target == null)
-        {
-            Debug.LogError("Editor target is null!");
-            return;
-        }
-
-        _target = (target as SharedVariableGetter<T, S>);
+        _target = (SharedVariableGetter<T, S>)target;
         if (_target == null)
         {
             Debug.LogError("Editor target cannot be cast to SharedVariableGetter!");
@@ -36,34 +33,25 @@ public abstract class SVGetterEditor<T, S> : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        _target.UpdateFieldInfo();
+        _target.UpdateMemberInfos();
 
-        // Draw default inspector properties
+        // Exclude the script field and other fields which will be customised
         DrawPropertiesExcluding(serializedObject, new string[] { "m_Script", "fieldName", "targetScript" });
 
-        var targetScriptProperty = serializedObject.FindProperty("targetScript");
-        var fieldNameProperty = serializedObject.FindProperty("fieldName");
+        SerializedProperty targetScriptProperty = serializedObject.FindProperty("targetScript");
+        SerializedProperty fieldNameProperty = serializedObject.FindProperty("fieldName");
 
-        EditorGUILayout.Space();
+        // Show the components in a drop down list
+        Component[] components = getterGameObject.GetComponents<Component>();
+        string[] componentNames = components.Select(c => c.GetType().Name).ToArray();
+        int currentComponentIndex = Array.IndexOf(components, targetScriptProperty.objectReferenceValue);
+        int newComponentIndex = EditorGUILayout.Popup("Component", currentComponentIndex, componentNames);
 
-        string[] componentNames = getterGameObject.GetComponents<Component>()
-            .Select(c => c.GetType().Name)
-            .ToArray();
+        // If a different component has been selected, update the targetScript property
+        if (newComponentIndex != currentComponentIndex)
+            targetScriptProperty.objectReferenceValue = components[newComponentIndex];
 
-
-        int currentIndex = -1; // Default to -1 indicating no selection
-        if (targetScriptProperty.objectReferenceValue != null)
-        {
-            currentIndex = Array.IndexOf(componentNames, targetScriptProperty.objectReferenceValue.GetType().Name);
-        }
-
-        int newIndex = EditorGUILayout.Popup("Component", currentIndex, componentNames);
-
-        if (newIndex != currentIndex)
-        {
-            targetScriptProperty.objectReferenceValue = getterGameObject.GetComponents<Component>()[newIndex];
-        }
-
+        // If no component is selected, show a message and return
         if (targetScriptProperty.objectReferenceValue == null)
         {
             EditorGUILayout.HelpBox("Please select a Component.", MessageType.Info);
@@ -71,37 +59,27 @@ public abstract class SVGetterEditor<T, S> : Editor
             return;
         }
 
-        // Get selected component
+        // Get the selected component and its type
         Component selectedComponent = (Component)targetScriptProperty.objectReferenceValue;
         Type componentType = selectedComponent.GetType();
 
-        // Get all the public fields and properties of the component type that match the type T
-        List<string> fieldsAndProperties = componentType
-            .GetMembers(BindingFlags.Public | BindingFlags.Instance)
-            .Where(member => member.MemberType == MemberTypes.Field && ((FieldInfo)member).FieldType == typeof(T) ||
-                             member.MemberType == MemberTypes.Property && ((PropertyInfo)member).PropertyType == typeof(T))
-            .Select(member => member.Name)
-            .ToList();
+        // Get all the public fields and properties of type T
+        string[] members = componentType.GetMembers(BindingFlags.Public | BindingFlags.Instance)
+            .Where(m => (m is FieldInfo fi && fi.FieldType == typeof(T)) || (m is PropertyInfo pi && pi.PropertyType == typeof(T)))
+            .Select(m => m.Name)
+            .ToArray();
 
+        // Show the fields/properties in a drop down list
+        int currentMemberIndex = Array.IndexOf(members, fieldNameProperty.stringValue);
+        int newMemberIndex = EditorGUILayout.Popup("Member Name", currentMemberIndex, members);
 
-        int currentSelectedIndex = fieldsAndProperties.IndexOf(fieldNameProperty.stringValue);
-        if (currentSelectedIndex == -1) currentSelectedIndex = 0;
+        // If a different field/property has been selected, update the fieldName property
+        if (newMemberIndex != currentMemberIndex)
+            fieldNameProperty.stringValue = members[newMemberIndex];
 
-        if (fieldsAndProperties.Any())
-        {
-            // Allow to choose a field/property
-            int newSelectedIndex = EditorGUILayout.Popup("Member Name", currentSelectedIndex, fieldsAndProperties.ToArray());
-
-            // If selection has been made, update the field name
-            if (newSelectedIndex >= 0)
-            {
-                fieldNameProperty.stringValue = fieldsAndProperties[newSelectedIndex];
-            }
-        }
-        else
-        {
-            EditorGUILayout.HelpBox($"The selected component '{targetScriptProperty.objectReferenceValue.GetType().Name}' does not contain any public fields or properties of type {typeof(T).Name}.", MessageType.Warning);
-        }
+        // If there are no suitable fields/properties, show a warning
+        if (members.Length == 0)
+            EditorGUILayout.HelpBox($"The selected component '{selectedComponent.GetType().Name}' does not contain any public fields or properties of type '{typeof(T).Name}'.", MessageType.Warning);
 
         serializedObject.ApplyModifiedProperties();
     }

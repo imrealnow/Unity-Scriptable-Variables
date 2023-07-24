@@ -1,12 +1,12 @@
 {
   "name": "com.liamgreen.sharedvariables",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "displayName": "Shared Variables",
-  "description": "A collection of scripts based on Ryan Hipple's 2017 talk enabling scriptable object based architecture. ",
-  "unity": "2019.3",
+  "description": "A collection of Unity scripts and tools for implementing a ScriptableObject-oriented game architecture, based on Ryan Hipple's 2017 GDC talk.",
+  "unity": "2021.1",
   "author": {
     "name": "Liam Green",
-    "email": "contact@liamgreen.net",
-    "url": "https://www.liamgreen.net"
+    "email": "contact@liam.green",
+    "url": "https://www.liam.greem"
   }
 }

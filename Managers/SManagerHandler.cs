@@ -1,64 +1,74 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-
+/// <summary>
+/// SManagerHandler is responsible for controlling the lifecycle of SManager instances and
+/// invoking their Update methods each frame.
+/// </summary>
 public class SManagerHandler : MonoBehaviour
 {
-    public List<SManager> managers = new List<SManager>();
+    /// <summary>
+    /// List of SManager instances controlled by this SManagerHandler.
+    /// </summary>
+    [SerializeField] private List<SManager> managers = new List<SManager>();
 
-    public delegate void GOCallback();
-    public GOCallback managersUpdate;
+    /// <summary>
+    /// Event invoked each frame for updating all SManager instances.
+    /// </summary>
+    private event Action managersUpdate;
 
     private void Start()
     {
-        if(managers.Count > 0)
-        {
-            for (int i = 0; i < managers.Count; i++)
-            {
-                managers[i].OnEnabled();
-            }
-        }
+        IterateManagers(manager => manager.OnEnabled());
     }
 
     private void OnEnable()
     {
-        if(managers.Count > 0)
+        IterateManagers(manager =>
         {
-            for(int i = 0; i < managers.Count; i++)
-            {
-                if (managers[i] != null)
-                {
-                    managers[i].AssignHandler(this);
-                    managers[i].enabled = true;
-                    managersUpdate += managers[i].Update;
-                }
-            }
-        }
+            manager.AssignHandler(this);
+            manager.enabled = true;
+            managersUpdate += manager.Update;
+        });
     }
 
     private void OnDisable()
     {
-        if (managers.Count > 0)
+        IterateManagers(manager =>
         {
-            for (int i = managers.Count - 1; i > -1; i--)
-            {
-                managers[i].OnDisabled();
-                managers[i].enabled = false;
-                managersUpdate -= managers[i].Update;
-            }
-        }
+            manager.OnDisabled();
+            manager.enabled = false;
+            managersUpdate -= manager.Update;
+        });
     }
 
     void FixedUpdate()
     {
-        if (managersUpdate != null)
-            managersUpdate.Invoke();
+        managersUpdate?.Invoke();
     }
 
+    /// <summary>
+    /// Resets all managers by disabling and re-enabling them.
+    /// </summary>
     public void Reset()
     {
         OnDisable();
         OnEnable();
+    }
+
+    /// <summary>
+    /// Helper method to perform an action on all SManager instances.
+    /// </summary>
+    /// <param name="action">The action to perform on each manager.</param>
+    private void IterateManagers(Action<SManager> action)
+    {
+        if (managers.Count > 0)
+        {
+            foreach (var manager in managers)
+            {
+                action(manager);
+            }
+        }
     }
 }

@@ -6,86 +6,42 @@ public abstract class VariableReferenceDrawer<T, S> : PropertyDrawer
 {
     private readonly float lineHeight = 20;
     private readonly float lineSpacing = 6;
-    private readonly float buttonWidth = 100;
-    private readonly float foldoutWidth = 14;
-    private readonly float boxPadding = 2;
-
     private bool foldout = true;
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        return foldout ? (lineHeight + lineSpacing) * 2 : lineHeight + lineSpacing * 2;
+        return foldout ? (lineHeight + lineSpacing) * 3 : lineHeight + lineSpacing * 2;
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        bool useConstant = property.FindPropertyRelative("useConstant").boolValue;
-        float editorWidth = EditorGUIUtility.currentViewWidth;
-
-        Color startGUIColor = GUI.color;
-        Color transparentColor = startGUIColor;
-        transparentColor.a = 0;
-
-        Rect boxRect;
-        Rect foldoutRect = new Rect(position.x + lineSpacing * 3, position.y + lineSpacing, foldoutWidth, lineHeight);
-        Rect labelRect = new Rect(
-                position.x + lineSpacing + foldoutWidth,
-                position.y + lineSpacing,
-                editorWidth - buttonWidth - foldoutWidth - lineSpacing * 4,
-                lineHeight
-            );
-        Rect buttonRect = new Rect(
-                editorWidth - buttonWidth - lineSpacing,
-                position.y + lineSpacing,
-                buttonWidth,
-                lineHeight
-            );
-        Rect foldoutButtonRect = new Rect(
-                position.x,
-                position.y + lineSpacing,
-                editorWidth - buttonWidth - foldoutWidth - lineSpacing * 3,
-                lineHeight
-            );
-
-        if (foldout)
-        {
-            boxRect = new Rect(
-                position.x - boxPadding,
-                position.y + lineSpacing - boxPadding,
-                position.width + boxPadding * 2,
-                lineHeight * 2 + boxPadding * 3
-            );
-        }
-        else
-        {
-            boxRect = new Rect(
-                position.x - boxPadding,
-                position.y + lineSpacing - boxPadding,
-                position.width + boxPadding * 2,
-                lineHeight + boxPadding * 2
-            );
-        }
-
-        GUI.Box(boxRect, GUIContent.none);
-        EditorGUI.Foldout(foldoutRect, foldout, GUIContent.none);
+        SerializedProperty useConstantProperty = property.FindPropertyRelative("useConstant");
+        bool useConstant = useConstantProperty.boolValue;
+        
+        // Create layout rectangles
+        Rect boxRect = new Rect(position.x, position.y + lineSpacing, position.width, foldout ? lineHeight * 2 : lineHeight);
+        Rect foldoutRect = new Rect(position.x + lineSpacing, position.y + lineSpacing, lineHeight, lineHeight);
+        Rect labelRect = new Rect(position.x + lineHeight + lineSpacing * 2, position.y + lineSpacing, position.width - lineHeight * 3 - lineSpacing * 4, lineHeight);
+        Rect buttonRect = new Rect(position.width - lineHeight * 2, position.y + lineSpacing, lineHeight * 2, lineHeight);
+        Rect propertyRect = new Rect(position.x + lineSpacing, position.y + lineHeight + lineSpacing * 2, position.width - lineSpacing * 2, lineHeight);
+        
         EditorGUI.LabelField(labelRect, label);
 
-        // invisible foldout button
-        GUI.color = transparentColor;
-        if (GUI.Button(foldoutButtonRect, ""))
-            foldout = !foldout;
-        GUI.color = startGUIColor;
-
-        if (GUI.Button(buttonRect, useConstant ? "Constant" : "Variable"))
+        // Button to toggle between constant and variable
+        if (GUI.Button(buttonRect, useConstant ? "Const" : "Var"))
         {
             useConstant = !useConstant;
-            property.FindPropertyRelative("useConstant").boolValue = useConstant;
+            useConstantProperty.boolValue = useConstant;
         }
+
+        // Foldout for extra properties
+        foldout = EditorGUI.Foldout(foldoutRect, foldout, GUIContent.none);
 
         if (!foldout)
             return;
 
-        Rect propertyRect = new Rect(position.x + lineSpacing, position.y + lineHeight + lineSpacing, position.width - lineSpacing, lineHeight);
-        EditorGUI.PropertyField(propertyRect, property.FindPropertyRelative(useConstant ? "_value" : "_variable"), GUIContent.none);
+        // Draw the selected property
+        SerializedProperty selectedProperty = property.FindPropertyRelative(useConstant ? "_value" : "_variable");
+        EditorGUI.PropertyField(propertyRect, selectedProperty, GUIContent.none);
     }
 }

@@ -6,26 +6,19 @@ using UnityEditor;
 [CustomPropertyDrawer(typeof(Cooldown))]
 public class CooldownDrawer : PropertyDrawer
 {
-    private readonly Color greyColor = new Color(120, 120, 120);
-    private readonly float elementSpacing = 2f;
-    private readonly float progressBarHeight = 5f;
-    private readonly float buttonWidth = 52f;
+    private static readonly Color greyColor = new Color(0.47f, 0.47f, 0.47f);
+    private static readonly float elementSpacing = 2f;
+    private static readonly float progressBarHeight = 5f;
+    private static readonly float buttonWidth = 52f;
 
-    private float labelWidth;
-    private float floatWidth;
-
-    private Color startGUIColor;
-    private float startDuration;
-    private float currentDuration;
-    private bool isInitialised;
     private Cooldown cooldownObject;
 
     private void Init(SerializedProperty property)
     {
         cooldownObject = EditorHelper.GetTargetObjectOfProperty(property) as Cooldown;
-        startGUIColor = GUI.color;
-        startDuration = property.FindPropertyRelative("_duration").floatValue;
-        isInitialised = true;
+        if(cooldownObject == null) {
+            return;
+        }
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -35,75 +28,41 @@ public class CooldownDrawer : PropertyDrawer
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        if (!isInitialised)
+        if (cooldownObject == null)
         {
             Init(property);
-            return;
         }
 
-        // get widths for elements
-        CalculateWidths();
+        // Get the duration values
+        SerializedProperty durationProperty = property.FindPropertyRelative("_duration");
+        float duration = durationProperty.floatValue;
+        float newDuration = EditorGUI.FloatField(new Rect(position.x, position.y, position.width - 2 * buttonWidth, EditorGUIUtility.singleLineHeight), label, duration);
 
-        // get duration values
-        currentDuration = property.FindPropertyRelative("_duration").floatValue;
-        bool durationsAreEqual = startDuration == currentDuration;
-
-        // try to get current cooldown progress
-        bool progressAvailable = cooldownObject != null;
-        float progressPercent;
-        Rect progressRect = new Rect();
-
-        //make progress bar if the percentage is available
-        if (progressAvailable)
+        // Buttons for updating and resetting duration
+        bool durationChanged = !Mathf.Approximately(newDuration, duration);
+        GUI.enabled = durationChanged;
+        if (GUI.Button(new Rect(position.width - buttonWidth, position.y, buttonWidth, EditorGUIUtility.singleLineHeight), "Update"))
         {
-            progressPercent = cooldownObject.GetProgressToReset();
-
-            progressRect = new Rect(
-                position.x,
-                position.y + EditorGUIUtility.singleLineHeight + elementSpacing,
-                EditorGUIUtility.currentViewWidth * progressPercent,
-                progressBarHeight
-                );
+            durationProperty.floatValue = newDuration;
         }
-        
-        // make the rects for the elements
-        Rect labelRect = new Rect(position.x, position.y, labelWidth, EditorGUIUtility.singleLineHeight);
-        position.x = EditorGUIUtility.currentViewWidth - buttonWidth;
-        Rect resetButtonRect = new Rect(position.x, position.y, buttonWidth - elementSpacing, EditorGUIUtility.singleLineHeight);
-        position.x -= buttonWidth + elementSpacing;
-        Rect updateButtonRect = new Rect(position.x, position.y, buttonWidth, EditorGUIUtility.singleLineHeight);
-        position.x -= floatWidth + elementSpacing;
-        Rect durationRect = new Rect(position.x, position.y, floatWidth, EditorGUIUtility.singleLineHeight);
-
-        // label and float field
-        EditorGUI.LabelField(labelRect, label);
-        startDuration = EditorGUI.FloatField(durationRect, startDuration);
-
-        // contextual buttons
-        GUI.enabled = !durationsAreEqual;
-        if (GUI.Button(updateButtonRect, "Update"))
-            property.FindPropertyRelative("_duration").floatValue = startDuration;
-        if(GUI.Button(resetButtonRect, "Reset"))
-            startDuration = property.FindPropertyRelative("_duration").floatValue;
         GUI.enabled = true;
-        if (progressAvailable)
+
+        // Progress bar
+        if (cooldownObject != null)
         {
-            GUI.color = Color.green;
-            GUI.Box(progressRect, GUIContent.none);
-            GUI.color = startGUIColor;
+            DrawProgressBar(position, cooldownObject.GetProgressToReset());
         }
 
-        if(Application.isPlaying)
+        if (Application.isPlaying)
+        {
             EditorUtility.SetDirty(property.serializedObject.targetObject);
+        }
     }
 
-    private void CalculateWidths()
+    private void DrawProgressBar(Rect position, float progress)
     {
-        float viewWidth =
-            EditorGUIUtility.currentViewWidth
-            - (elementSpacing * 4f)
-            - buttonWidth * 2;
-        labelWidth = EditorGUIUtility.labelWidth;
-        floatWidth = viewWidth - labelWidth - elementSpacing;
+        GUI.color = Color.green;
+        GUI.Box(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + elementSpacing, position.width * progress, progressBarHeight), GUIContent.none);
+        GUI.color = Color.white;
     }
 }

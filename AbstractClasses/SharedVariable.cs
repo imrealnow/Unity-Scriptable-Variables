@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// SharedVariable is a generic ScriptableObject that can hold any type of variable. 
+/// </summary>
+/// <typeparam name="T">The type of the variable.</typeparam>
 [System.Serializable]
 public class SharedVariable<T> : ScriptableObject
 {
@@ -14,9 +18,15 @@ public class SharedVariable<T> : ScriptableObject
     [TextArea]
     private string description;
 
-    public delegate void OnVariableChanged();
-    public OnVariableChanged variableChanged;
+    /// <summary>
+    /// Event that gets triggered when the value of the variable changes.
+    /// </summary>
+    public event Action variableChanged;
 
+    /// <summary>
+    /// Gets or sets the value of the variable. 
+    /// If resetValueOnLoad is true, it uses a placeholder value that can be reset.
+    /// </summary>
     public T Value
     {
         get
@@ -36,10 +46,12 @@ public class SharedVariable<T> : ScriptableObject
                 if (variableChanged != null)
                     variableChanged.Invoke();
             }
-
         }
     }
 
+    /// <summary>
+    /// When enabled, checks if the value should be reset and if so assigns it to placeholder.
+    /// </summary>
     private void OnEnable()
     {
         if (resetValueOnLoad)
