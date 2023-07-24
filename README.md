@@ -12,11 +12,15 @@ This project is a set of Unity scripts and tools designed to facilitate the use 
 
 - **Event Systems:** Leverage the power of Unity Events, but with a more flexible and decoupled design, thanks to the use of ScriptableObjects.
 
-- **Custom Editor Tools:** Generate necessary boilerplate scripts to support new shared variable types or extend the SEvent class with a custom editor window.
+- **SCooldowns:** Implement a duration-based cooldown system with SCooldowns. They store a duration and provide the percentage of time remaining before they reset, making it easy to control game mechanics such as abilities, AI behaviors, and more.
+
+- **SManagers:** Make use of SManagers, special objects that maintain references to sets of other ScriptableObjects. Ideal for managing large groups of shared variables or SCooldowns.
+
+- **Custom Editor Tools:** Generate necessary boilerplate scripts to support new shared variable types, extend the SCooldown or SManager classes, and tailor the Unity Editor to your needs with a custom editor window.
 
 ## Usage
 
-To use this project, import the provided scripts into your Unity project. Once the scripts are imported, you can create Shared Variable ScriptableObjects from the Unity editor, attach getters to your game objects, and more.
+To use this project, import the provided scripts into your Unity project. Once the scripts are imported, you can create Shared Variable, SCooldown, and SManager ScriptableObjects from the Unity editor, attach getters to your game objects, and more.
 
 For more detailed instructions on using each feature, see the included example scenes and scripts.
 
@@ -27,4 +31,3 @@ Contributions to this project are welcome! Please submit a pull request with any
 ## License
 
 This project is licensed under the MIT License. Please see the LICENSE file for more details.
-
