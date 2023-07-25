@@ -1,4 +1,7 @@
-﻿[Serializable]
+﻿using System;
+using UnityEngine;
+
+[Serializable]
 public class Cooldown
 {
     [SerializeField] private float _duration;
@@ -14,20 +17,20 @@ public class Cooldown
     /// Gets or sets the duration of the cooldown.
     /// Setting the duration will restart the cooldown.
     /// </summary>
-    public float Duration 
-    { 
+    public float Duration
+    {
         get => _duration;
-        set 
+        set
         {
             _duration = Mathf.Abs(value);
-            _startTime = Time.time;
+            _startTime = Time.time - _duration;
         }
     }
 
     /// <summary>
     /// Gets the remaining time before the cooldown is reset.
     /// </summary>
-    public float RemainingTime => !_initialised || GetProgressToReset() >= 1 ? 0 : EndTime - Time.time;
+    public float RemainingTime => !_initialised || ProgressToReset >= 1 ? 0 : EndTime - Time.time;
 
     /// <summary>
     /// Gets the progress to the cooldown reset, expressed as a value between 0 and 1.

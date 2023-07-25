@@ -11,7 +11,7 @@ public class RunningSet : ScriptableObject
     /// <summary>
     /// The set of GameObjects in the running set.
     /// </summary>
-    private Set<GameObject> set = new HashSet<GameObject>();
+    private HashSet<GameObject> set = new HashSet<GameObject>();
 
     /// <summary>
     /// A read-only version of the set.

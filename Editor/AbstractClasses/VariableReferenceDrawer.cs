@@ -1,47 +1,52 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-public abstract class VariableReferenceDrawer<T, S> : PropertyDrawer
-    where S : SharedVariable<T>
+public abstract class VariableReferenceDrawer<T, S> : PropertyDrawer where S : SharedVariable<T>
 {
-    private readonly float lineHeight = 20;
+    private const string buttonLabelConstant = "Const";
+    private const string buttonLabelVariable = "Var";
     private readonly float lineSpacing = 6;
-    private bool foldout = true;
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        return foldout ? (lineHeight + lineSpacing) * 3 : lineHeight + lineSpacing * 2;
+        SerializedProperty useConstantProperty = property.FindPropertyRelative("useConstant");
+        bool useConstant = useConstantProperty.boolValue;
+        SerializedProperty selectedProperty = property.FindPropertyRelative(useConstant ? "_value" : "_variable");
+
+        // Get the height of the property field
+        float propertyHeight = EditorGUI.GetPropertyHeight(selectedProperty, true);
+
+        return EditorGUIUtility.singleLineHeight + lineSpacing * 4 + propertyHeight;
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         SerializedProperty useConstantProperty = property.FindPropertyRelative("useConstant");
         bool useConstant = useConstantProperty.boolValue;
-        
-        // Create layout rectangles
-        Rect boxRect = new Rect(position.x, position.y + lineSpacing, position.width, foldout ? lineHeight * 2 : lineHeight);
-        Rect foldoutRect = new Rect(position.x + lineSpacing, position.y + lineSpacing, lineHeight, lineHeight);
-        Rect labelRect = new Rect(position.x + lineHeight + lineSpacing * 2, position.y + lineSpacing, position.width - lineHeight * 3 - lineSpacing * 4, lineHeight);
-        Rect buttonRect = new Rect(position.width - lineHeight * 2, position.y + lineSpacing, lineHeight * 2, lineHeight);
-        Rect propertyRect = new Rect(position.x + lineSpacing, position.y + lineHeight + lineSpacing * 2, position.width - lineSpacing * 2, lineHeight);
-        
-        EditorGUI.LabelField(labelRect, label);
 
-        // Button to toggle between constant and variable
-        if (GUI.Button(buttonRect, useConstant ? "Const" : "Var"))
+        // Compute button width based on the size of the text
+        var buttonLabel = useConstant ? buttonLabelConstant : buttonLabelVariable;
+        var buttonWidth = GUI.skin.button.CalcSize(new GUIContent(buttonLabel)).x + lineSpacing;
+
+        // Create layout rectangles
+        Rect labelRect = new Rect(position.x + lineSpacing, position.y + lineSpacing, position.width - buttonWidth - lineSpacing * 3, EditorGUIUtility.singleLineHeight);
+        Rect buttonRect = new Rect(position.x + position.width - buttonWidth - lineSpacing, position.y + lineSpacing, buttonWidth, EditorGUIUtility.singleLineHeight);
+
+        // Draw the label and the button
+        EditorGUI.LabelField(labelRect, label);
+        if (GUI.Button(buttonRect, buttonLabel))
         {
             useConstant = !useConstant;
             useConstantProperty.boolValue = useConstant;
         }
 
-        // Foldout for extra properties
-        foldout = EditorGUI.Foldout(foldoutRect, foldout, GUIContent.none);
-
-        if (!foldout)
-            return;
-
         // Draw the selected property
         SerializedProperty selectedProperty = property.FindPropertyRelative(useConstant ? "_value" : "_variable");
-        EditorGUI.PropertyField(propertyRect, selectedProperty, GUIContent.none);
+        Rect propertyRect = new Rect(position.x + lineSpacing, position.y + EditorGUIUtility.singleLineHeight + lineSpacing * 2, position.width - lineSpacing * 2, position.height - EditorGUIUtility.singleLineHeight - lineSpacing * 4);
+        EditorGUI.PropertyField(propertyRect, selectedProperty, new GUIContent(""));
+
+        // Draw the box encompassing everything
+        Rect boxRect = new Rect(position.x, position.y, position.width, position.height - lineSpacing);
+        GUI.Box(boxRect, GUIContent.none);
     }
 }

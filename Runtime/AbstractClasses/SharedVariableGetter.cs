@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -62,13 +63,13 @@ public abstract class SharedVariableGetter<T, S> : MonoBehaviour
             UpdateSharedVariable();
     }
 
-    private void UpdateSharedVariable()
+    public void UpdateSharedVariable()
     {
         if (sharedVariable != null)
             sharedVariable.Value = Value;
     }
 
-    private void UpdateMemberInfos()
+    public void UpdateMemberInfos()
     {
         // Split the fieldName into parts, and get the MemberInfo for each part
         string[] parts = fieldName.Split('.');
@@ -85,7 +86,7 @@ public abstract class SharedVariableGetter<T, S> : MonoBehaviour
         }
     }
 
-    private static Type GetMemberInfoType(MemberInfo memberInfo)
+    public static Type GetMemberInfoType(MemberInfo memberInfo)
     {
         switch (memberInfo)
         {
@@ -98,7 +99,7 @@ public abstract class SharedVariableGetter<T, S> : MonoBehaviour
         }
     }
 
-    private static object GetValueFromMemberInfo(object obj, MemberInfo memberInfo)
+    public static object GetValueFromMemberInfo(object obj, MemberInfo memberInfo)
     {
         switch (memberInfo)
         {

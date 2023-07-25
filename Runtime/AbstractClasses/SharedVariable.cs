@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// SharedVariable is a generic ScriptableObject that can hold any type of variable. 

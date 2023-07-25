@@ -9,6 +9,7 @@ public class RunningSetHandler : MonoBehaviour
     /// Reference to the RunningSet this GameObject should be added to and removed from.
     /// </summary>
     [SerializeField] private RunningSet runningSet;
+    public RunningSet RunningSet => runningSet;
 
     /// <summary>
     /// Adds the GameObject to the RunningSet when the GameObject is enabled.

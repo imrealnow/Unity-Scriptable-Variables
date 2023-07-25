@@ -7,15 +7,15 @@ public class SetHandlerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        SetHandler _target = target as SetHandler;
+        RunningSetHandler _target = target as RunningSetHandler;
 
         // Running Set field
         SerializedProperty runningSetProperty = serializedObject.FindProperty("runningSet");
         EditorGUILayout.PropertyField(runningSetProperty, new GUIContent("Running Set"));
 
         // If runningSet is not null, display its current count
-        if(_target.runningSet != null)
-            EditorGUILayout.HelpBox("Current object count: " + _target.runningSet.Count.ToString(), MessageType.Info);
+        if (_target.RunningSet != null)
+            EditorGUILayout.HelpBox("Current object count: " + _target.RunningSet.Count.ToString(), MessageType.Info);
 
         // Apply the changes to the serializedObject
         serializedObject.ApplyModifiedProperties();

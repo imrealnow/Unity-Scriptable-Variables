@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 /// <summary>
@@ -12,6 +13,7 @@ public class SManagerHandler : MonoBehaviour
     /// List of SManager instances controlled by this SManagerHandler.
     /// </summary>
     [SerializeField] private List<SManager> managers = new List<SManager>();
+    public ReadOnlyCollection<SManager> Managers => managers.AsReadOnly();
 
     /// <summary>
     /// Event invoked each frame for updating all SManager instances.
@@ -70,5 +72,42 @@ public class SManagerHandler : MonoBehaviour
                 action(manager);
             }
         }
+    }
+
+    /// <summary>
+    /// Initialises and adds manager to handler.
+    /// </summary>
+    /// <param name="manager">Manager to add</param>
+    public void AddManager(SManager manager)
+    {
+        manager.AssignHandler(this);
+        manager.enabled |= true;
+        managersUpdate += manager.Update;
+        managers.Add(manager);
+    }
+
+    /// <summary>
+    /// Disable, clean up and remove manager from handler.
+    /// </summary>
+    /// <param name="manager">Manager to remove</param>
+    /// <returns>Returns false if manager did not exist, true if successfully removed</returns>
+    public bool RemoveManager(SManager manager)
+    {
+        if (!managers.Contains(manager)) return false;
+        manager.OnDisabled();
+        manager.enabled = false;
+        managersUpdate -= manager.Update;
+        managers.Remove(manager);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes manager at index in list
+    /// </summary>
+    /// <param name="index">Index of manager to remove</param>
+    public void RemoveManagerAt(int index)
+    {
+        if (index >= managers.Count) return;
+        RemoveManager(managers[index]);
     }
 }

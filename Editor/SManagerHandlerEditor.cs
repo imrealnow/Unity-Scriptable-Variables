@@ -13,7 +13,7 @@ public class SManagerHandlerEditor : Editor
     {
         SManagerHandler handler = (SManagerHandler)target;
 
-        for (int i = 0; i < handler.managers.Count; i++)
+        for (int i = 0; i < handler.Managers.Count; i++)
         {
             if (foldouts.Count <= i)
             {
@@ -23,20 +23,20 @@ public class SManagerHandlerEditor : Editor
             EditorGUILayout.BeginVertical("box"); // Start box
 
             EditorGUILayout.BeginHorizontal();
-            foldouts[i] = EditorGUILayout.Foldout(foldouts[i], handler.managers[i].name);
+            foldouts[i] = EditorGUILayout.Foldout(foldouts[i], handler.Managers[i].name);
 
             // find SManager in project files
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_ViewToolZoom"), GUILayout.Width(30)))
             {
-                EditorGUIUtility.PingObject(handler.managers[i]);
+                EditorGUIUtility.PingObject(handler.Managers[i]);
             }
 
             // remove SManager
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash"), GUILayout.Width(30)))
             {
                 // Removes manager from the list
-                DestroyImmediate(handler.managers[i], true);
-                handler.managers.RemoveAt(i);
+                handler.RemoveManagerAt(i);
+                DestroyImmediate(handler.Managers[i], true);
                 foldouts.RemoveAt(i);
                 --i;
                 continue;
@@ -45,7 +45,7 @@ public class SManagerHandlerEditor : Editor
 
             if (foldouts[i])
             {
-                Editor sManagerEditor = CreateEditor(handler.managers[i]);
+                Editor sManagerEditor = CreateEditor(handler.Managers[i]);
                 sManagerEditor.OnInspectorGUI();
             }
 
@@ -81,7 +81,7 @@ public class SManagerHandlerEditor : Editor
                         AssetDatabase.CreateAsset(sManager, path);
                         AssetDatabase.SaveAssets();
 
-                        handler.managers.Add(sManager);
+                        handler.AddManager(sManager);
                     }
                 });
             }
@@ -93,7 +93,7 @@ public class SManagerHandlerEditor : Editor
     private List<Type> GetUninstantiatedSubclassesOfSManager(SManagerHandler handler)
     {
         var subclasses = new List<Type>();
-        var instantiatedTypes = new HashSet<Type>(handler.managers.Select(m => m.GetType()));
+        var instantiatedTypes = new HashSet<Type>(handler.Managers.Select(m => m.GetType()));
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
